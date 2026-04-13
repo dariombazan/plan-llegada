@@ -2,60 +2,43 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Plan de Llegada</title>
+<title>Plan Inteligente</title>
 
 <style>
 body {
-    font-family: Arial;
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    font-family: 'Segoe UI', sans-serif;
+    background: #f4f6f9;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
-    transition: 0.3s;
-}
-
-.dark {
-    background: #1e1e1e;
-    color: white;
 }
 
 .container {
     background: white;
     padding: 25px;
     border-radius: 20px;
-    width: 360px;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-}
-
-.dark .container {
-    background: #2c2c2c;
+    width: 370px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
 .logo {
     display: block;
     margin: 0 auto 10px;
-    width: 70px;
+    width: 60px;
 }
 
 h2 {
     text-align: center;
-    margin-bottom: 15px;
-}
-
-label {
-    display: block;
-    margin-top: 10px;
-    font-weight: bold;
 }
 
 input, select {
     width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border-radius: 8px;
-    border: none;
+    padding: 10px;
+    margin-top: 8px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
 }
 
 button {
@@ -64,36 +47,44 @@ button {
     padding: 12px;
     border-radius: 12px;
     border: none;
-    background: linear-gradient(90deg, #4facfe, #00c6ff);
+    background: #2d3436;
     color: white;
-    cursor: pointer;
     font-weight: bold;
+    cursor: pointer;
 }
 
-.result-card {
-    background: rgba(255,255,255,0.1);
-    border-radius: 15px;
-    padding: 15px;
+/* RESULTADO */
+
+.main-time {
+    text-align: center;
+    font-size: 40px;
+    font-weight: bold;
+    margin: 10px 0;
 }
 
-.item {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
+.timeline {
+    border-left: 2px solid #ccc;
+    margin-left: 10px;
+    padding-left: 15px;
 }
 
-.item:last-child {
-    border-bottom: none;
+.event {
+    margin-bottom: 15px;
+    position: relative;
 }
 
-.titulo {
-    font-size: 14px;
-    opacity: 0.8;
+.event::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 5px;
+    width: 10px;
+    height: 10px;
+    background: #2d3436;
+    border-radius: 50%;
 }
 
-.hora {
-    font-size: 18px;
+.time {
     font-weight: bold;
 }
 
@@ -102,25 +93,9 @@ button {
     font-size: 14px;
 }
 
-.barra {
-    height: 10px;
-    background: #ddd;
-    border-radius: 10px;
-    margin-top: 10px;
-}
-
-.progreso {
-    height: 10px;
-    background: #00b894;
-    border-radius: 10px;
-    width: 0%;
-    transition: 0.5s;
-}
-
-.toggle {
-    margin-top: 10px;
-    text-align: center;
-    cursor: pointer;
+.volver {
+    margin-top: 15px;
+    background: #0984e3;
 }
 
 .error {
@@ -133,49 +108,39 @@ button {
 
 <div class="container">
 
-<!-- FORMULARIO -->
 <div id="pantallaFormulario">
 
 <img src="logo.png" class="logo">
 <h2>Plan de Llegada</h2>
 
-<label>Hora entrada</label>
-<input type="number" id="hora">
+<input type="number" id="hora" placeholder="Hora entrada (HH)">
+<input type="number" id="distancia" placeholder="Distancia (km)">
 
-<label>Distancia (km)</label>
-<input type="number" id="distancia">
-
-<label>Transporte</label>
 <select id="transporte">
-    <option value="" selected disabled>Seleccione una opción</option>
-    <option value="carro">Carro</option>
-    <option value="moto">Moto</option>
-    <option value="bus">Bus</option>
-    <option value="bicicleta">Bicicleta</option>
-    <option value="metro">Metro</option>
+<option value="" disabled selected>Seleccione transporte</option>
+<option value="carro">Carro</option>
+<option value="moto">Moto</option>
+<option value="bus">Bus</option>
+<option value="bicicleta">Bicicleta</option>
+<option value="metro">Metro</option>
 </select>
 
-<label>Alistamiento (min)</label>
-<input type="number" id="alistamiento">
-
-<label>Tráfico (min)</label>
-<input type="number" id="trafico">
+<input type="number" id="alistamiento" placeholder="Tiempo alistamiento">
+<input type="number" id="trafico" placeholder="Tráfico">
 
 <button onclick="calcular()">Calcular</button>
 
-<div id="botonModo" class="toggle" onclick="modoOscuro()">🌙 Modo oscuro</div>
 <div id="error" class="error"></div>
 
 </div>
 
-<!-- RESULTADO -->
 <div id="pantallaResultado" style="display:none;">
 
 <h2>Tu Plan</h2>
 
-<div id="resultado" class="result-card"></div>
+<div id="resultado"></div>
 
-<button onclick="volver()">⬅ Volver</button>
+<button class="volver" onclick="volver()">⬅ Volver</button>
 
 </div>
 
@@ -183,129 +148,103 @@ button {
 
 <script>
 
-function convertirHora(min) {
-    let h = Math.floor(min / 60);
-    let m = Math.floor(min % 60);
-    return String(h).padStart(2,'0') + ":" + String(m).padStart(2,'0');
+function iconoTransporte(tipo){
+    if(tipo==="carro") return "🚗";
+    if(tipo==="moto") return "🏍️";
+    if(tipo==="bus") return "🚌";
+    if(tipo==="bicicleta") return "🚲";
+    if(tipo==="metro") return "🚇";
 }
 
-function calcular() {
-
-    let error = document.getElementById("error");
-    error.innerHTML = "";
-
-    let hora = parseInt(document.getElementById("hora").value);
-    let distancia = parseFloat(document.getElementById("distancia").value);
-    let transporte = document.getElementById("transporte").value;
-    let alistamiento = parseFloat(document.getElementById("alistamiento").value);
-    let trafico = parseFloat(document.getElementById("trafico").value);
-
-    if (isNaN(hora) || hora < 0 || hora > 23) {
-        error.innerHTML = "Hora inválida";
-        return;
-    }
-
-    if (!transporte) {
-        error.innerHTML = "Seleccione transporte";
-        return;
-    }
-
-    let velocidades = {
-        carro: 40,
-        moto: 50,
-        bus: 25,
-        bicicleta: 15,
-        metro: 60
-    };
-
-    let velocidad = velocidades[transporte];
-    let margen = 15;
-
-    let tiempo = (distancia / velocidad) * 60 + trafico;
-    let salir = (hora * 60) - tiempo;
-    let despertar = salir - alistamiento - margen;
-
-    if (despertar < 0) {
-        error.innerHTML = "Tiempo insuficiente";
-        return;
-    }
-
-    let t1 = despertar + alistamiento*0.4;
-    let t2 = t1 + alistamiento*0.3;
-    let t3 = t2 + alistamiento*0.3;
-
-    document.getElementById("resultado").innerHTML = `
-        <div class="item">
-            <span class="titulo">🛌 Despertar</span>
-            <span class="hora">${convertirHora(despertar)}</span>
-        </div>
-
-        <div class="item">
-            <span class="titulo">🚿 Aseo</span>
-            <span class="hora">${convertirHora(despertar)} → ${convertirHora(t1)}</span>
-        </div>
-
-        <div class="item">
-            <span class="titulo">🍳 Desayuno</span>
-            <span class="hora">${convertirHora(t1)} → ${convertirHora(t2)}</span>
-        </div>
-
-        <div class="item">
-            <span class="titulo">👔 Prepararse</span>
-            <span class="hora">${convertirHora(t2)} → ${convertirHora(t3)}</span>
-        </div>
-
-        <div class="item">
-            <span class="titulo">🚪 Salida</span>
-            <span class="hora">${convertirHora(salir)}</span>
-        </div>
-
-        <div class="resumen">
-            🚗 ${transporte} <br>
-            ⏱ ${tiempo.toFixed(1)} min
-        </div>
-
-        <div class="barra">
-            <div class="progreso" id="barraProgreso"></div>
-        </div>
-    `;
-
-    setTimeout(() => {
-        document.getElementById("barraProgreso").style.width = "100%";
-    }, 100);
-
-    document.getElementById("pantallaFormulario").style.display = "none";
-    document.getElementById("pantallaResultado").style.display = "block";
+function convertirHora(min){
+    let h=Math.floor(min/60);
+    let m=Math.floor(min%60);
+    return String(h).padStart(2,'0')+":"+String(m).padStart(2,'0');
 }
 
-function volver() {
-    document.getElementById("pantallaResultado").style.display = "none";
-    document.getElementById("pantallaFormulario").style.display = "block";
+function calcular(){
+
+let error=document.getElementById("error");
+error.innerHTML="";
+
+let hora=parseInt(document.getElementById("hora").value);
+let distancia=parseFloat(document.getElementById("distancia").value);
+let transporte=document.getElementById("transporte").value;
+let alistamiento=parseFloat(document.getElementById("alistamiento").value);
+let trafico=parseFloat(document.getElementById("trafico").value);
+
+if(isNaN(hora)||hora<0||hora>23){
+    error.innerHTML="Hora inválida";
+    return;
 }
 
-function modoOscuro() {
-    let body = document.body;
-    let boton = document.getElementById("botonModo");
-
-    body.classList.toggle("dark");
-
-    if (body.classList.contains("dark")) {
-        boton.innerHTML = "☀️ Modo claro";
-        localStorage.setItem("modo", "oscuro");
-    } else {
-        boton.innerHTML = "🌙 Modo oscuro";
-        localStorage.setItem("modo", "claro");
-    }
+if(!transporte){
+    error.innerHTML="Seleccione transporte";
+    return;
 }
 
-window.onload = function() {
-    let modo = localStorage.getItem("modo");
-    let boton = document.getElementById("botonModo");
+let velocidades={
+carro:40,moto:50,bus:25,bicicleta:15,metro:60
+};
 
-    if (modo === "oscuro") {
-        document.body.classList.add("dark");
-        boton.innerHTML = "☀️ Modo claro";
-    }
+let velocidad=velocidades[transporte];
+let margen=15;
+
+let tiempo=(distancia/velocidad)*60+trafico;
+let salir=(hora*60)-tiempo;
+let despertar=salir-alistamiento-margen;
+
+if(despertar<0){
+    error.innerHTML="Tiempo insuficiente";
+    return;
+}
+
+let t1=despertar+alistamiento*0.4;
+let t2=t1+alistamiento*0.3;
+let t3=t2+alistamiento*0.3;
+
+document.getElementById("resultado").innerHTML=`
+
+<div class="main-time">${convertirHora(despertar)}</div>
+
+<div class="timeline">
+
+<div class="event">
+<div class="time">🚿 ${convertirHora(despertar)} - ${convertirHora(t1)}</div>
+<div>Aseo</div>
+</div>
+
+<div class="event">
+<div class="time">🍳 ${convertirHora(t1)} - ${convertirHora(t2)}</div>
+<div>Desayuno</div>
+</div>
+
+<div class="event">
+<div class="time">👔 ${convertirHora(t2)} - ${convertirHora(t3)}</div>
+<div>Prepararse</div>
+</div>
+
+<div class="event">
+<div class="time">🚪 ${convertirHora(salir)}</div>
+<div>Salida</div>
+</div>
+
+</div>
+
+<div class="resumen">
+${iconoTransporte(transporte)} ${transporte} <br>
+⏱ ${tiempo.toFixed(1)} min
+</div>
+`;
+
+document.getElementById("pantallaFormulario").style.display="none";
+document.getElementById("pantallaResultado").style.display="block";
+
+}
+
+function volver(){
+document.getElementById("pantallaResultado").style.display="none";
+document.getElementById("pantallaFormulario").style.display="block";
 }
 
 </script>
