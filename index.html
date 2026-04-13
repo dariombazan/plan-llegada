@@ -148,7 +148,7 @@ button {
 
 <button onclick="calcular()">Calcular</button>
 
-<div class="toggle" onclick="modoOscuro()">🌙 Modo oscuro</div>
+<div id="botonModo" class="toggle" onclick="modoOscuro()">🌙 Modo oscuro</div>
 
 <div id="error" class="error"></div>
 
@@ -255,7 +255,28 @@ function volver() {
 }
 
 function modoOscuro() {
-    document.body.classList.toggle("dark");
+    let body = document.body;
+    let boton = document.getElementById("botonModo");
+
+    body.classList.toggle("dark");
+
+    if (body.classList.contains("dark")) {
+        boton.innerHTML = "☀️ Modo claro";
+        localStorage.setItem("modo", "oscuro");
+    } else {
+        boton.innerHTML = "🌙 Modo oscuro";
+        localStorage.setItem("modo", "claro");
+    }
+}
+
+window.onload = function() {
+    let modo = localStorage.getItem("modo");
+    let boton = document.getElementById("botonModo");
+
+    if (modo === "oscuro") {
+        document.body.classList.add("dark");
+        boton.innerHTML = "☀️ Modo claro";
+    }
 }
 
 </script>
