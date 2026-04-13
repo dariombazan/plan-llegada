@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Plan Inteligente</title>
+<title>Plan SENA</title>
 
 <style>
 body {
@@ -13,6 +13,13 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
+    transition: 0.3s;
+}
+
+/* MODO OSCURO */
+.dark {
+    background: #121212;
+    color: white;
 }
 
 .container {
@@ -21,6 +28,10 @@ body {
     border-radius: 20px;
     width: 370px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.dark .container {
+    background: #1e1e1e;
 }
 
 .logo {
@@ -33,6 +44,7 @@ h2 {
     text-align: center;
 }
 
+/* INPUTS */
 input, select {
     width: 100%;
     padding: 10px;
@@ -41,31 +53,44 @@ input, select {
     border: 1px solid #ddd;
 }
 
+/* BOTONES */
 button {
     width: 100%;
     margin-top: 15px;
     padding: 12px;
     border-radius: 12px;
     border: none;
-    background: #2d3436;
+    background: #70b22d;
     color: white;
     font-weight: bold;
     cursor: pointer;
 }
 
-/* RESULTADO */
+/* BOTÓN VOLVER */
+.volver {
+    background: #2d3436;
+}
 
+/* TOGGLE */
+.toggle {
+    margin-top: 10px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* RESULTADO */
 .main-time {
     text-align: center;
-    font-size: 40px;
+    font-size: 42px;
     font-weight: bold;
-    margin: 10px 0;
+    color: #70b22d;
 }
 
 .timeline {
-    border-left: 2px solid #ccc;
-    margin-left: 10px;
-    padding-left: 15px;
+    border-left: 3px solid #70b22d;
+    margin-left: 15px;
+    padding-left: 25px;
 }
 
 .event {
@@ -76,11 +101,11 @@ button {
 .event::before {
     content: '';
     position: absolute;
-    left: -8px;
-    top: 5px;
-    width: 10px;
-    height: 10px;
-    background: #2d3436;
+    left: -18px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: #70b22d;
     border-radius: 50%;
 }
 
@@ -89,15 +114,19 @@ button {
 }
 
 .resumen {
-    margin-top: 15px;
-    font-size: 14px;
+    margin-top: 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
 }
 
-.volver {
-    margin-top: 15px;
-    background: #0984e3;
+.resumen span {
+    display: block;
+    margin-top: 5px;
+    font-size: 18px;
 }
 
+/* ERROR */
 .error {
     color: red;
 }
@@ -108,10 +137,11 @@ button {
 
 <div class="container">
 
+<!-- FORMULARIO -->
 <div id="pantallaFormulario">
 
 <img src="logo.png" class="logo">
-<h2>Plan de Llegada</h2>
+<h2>Plan de Llegada Puntual al Trabajo</h2>
 
 <input type="number" id="hora" placeholder="Hora entrada (HH)">
 <input type="number" id="distancia" placeholder="Distancia (km)">
@@ -125,15 +155,18 @@ button {
 <option value="metro">Metro</option>
 </select>
 
-<input type="number" id="alistamiento" placeholder="Tiempo alistamiento">
-<input type="number" id="trafico" placeholder="Tráfico">
+<input type="number" id="alistamiento" placeholder="Tiempo alistamiento (min)">
+<input type="number" id="trafico" placeholder="Tráfico (min)">
 
 <button onclick="calcular()">Calcular</button>
+
+<div id="botonModo" class="toggle" onclick="modoOscuro()">🌙 Modo oscuro</div>
 
 <div id="error" class="error"></div>
 
 </div>
 
+<!-- RESULTADO -->
 <div id="pantallaResultado" style="display:none;">
 
 <h2>Tu Plan</h2>
@@ -205,9 +238,16 @@ let t3=t2+alistamiento*0.3;
 
 document.getElementById("resultado").innerHTML=`
 
-<div class="main-time">${convertirHora(despertar)}</div>
+<div class="main-time">
+    <div style="font-size:14px; color:gray;">Inicio del día</div>
+    ${convertirHora(despertar)}
+</div>
 
 <div class="timeline">
+<div class="event">
+    <div class="time">🛌 ${convertirHora(despertar)}</div>
+    <div>Despertar</div>
+</div>
 
 <div class="event">
 <div class="time">🚿 ${convertirHora(despertar)} - ${convertirHora(t1)}</div>
@@ -245,6 +285,31 @@ document.getElementById("pantallaResultado").style.display="block";
 function volver(){
 document.getElementById("pantallaResultado").style.display="none";
 document.getElementById("pantallaFormulario").style.display="block";
+}
+
+function modoOscuro(){
+let body=document.body;
+let boton=document.getElementById("botonModo");
+
+body.classList.toggle("dark");
+
+if(body.classList.contains("dark")){
+boton.innerHTML="☀️ Modo claro";
+localStorage.setItem("modo","oscuro");
+}else{
+boton.innerHTML="🌙 Modo oscuro";
+localStorage.setItem("modo","claro");
+}
+}
+
+window.onload=function(){
+let modo=localStorage.getItem("modo");
+let boton=document.getElementById("botonModo");
+
+if(modo==="oscuro"){
+document.body.classList.add("dark");
+boton.innerHTML="☀️ Modo claro";
+}
 }
 
 </script>
